@@ -23,6 +23,9 @@
         <tr><td valign="top"><b>New link:</b></td><td>
         	<input type="checkbox" name="privateLinkByDefault" id="privateLinkByDefault" {if="!empty($GLOBALS['privateLinkByDefault'])"}checked{/if}/><label for="privateLinkByDefault">&nbsp;All new link are private by default</label></td>
         </tr>
+        <tr><td valign="top"><b>Archive:</b></td><td>
+        	<input type="checkbox" name="archiveLinkByDefault" id="archiveLinkByDefault" {if="!empty($GLOBALS['archiveLinkByDefault'])"}checked{/if}/><label for="archiveLinkByDefault">&nbsp;All new link are archived by default</label></td>
+        </tr>
 	  <tr><td></td><td align="right"><input type="submit" name="Save" value="Save config" class="bigbutton"></td></tr>
 	</table>
 	</form>

@@ -29,6 +29,7 @@ $GLOBALS['config']['PUBSUBHUB_URL'] = ''; // PubSubHubbub support. Put an empty 
 $GLOBALS['config']['UPDATECHECK_FILENAME'] = $GLOBALS['config']['DATADIR'].'/lastupdatecheck.txt'; // For updates check of Shaarli.
 $GLOBALS['config']['UPDATECHECK_INTERVAL'] = 86400 ; // Updates check frequency for Shaarli. 86400 seconds=24 hours
                                           // Note: You must have publisher.php in the same directory as Shaarli index.php
+
 // -----------------------------------------------------------------------------------------------
 // You should not touch below (or at your own risks !)
 // Optionnal config file.
@@ -105,6 +106,7 @@ if (empty($GLOBALS['redirector'])) $GLOBALS['redirector']='';
 if (empty($GLOBALS['disablesessionprotection'])) $GLOBALS['disablesessionprotection']=false;
 if (empty($GLOBALS['disablejquery'])) $GLOBALS['disablejquery']=false;
 if (empty($GLOBALS['privateLinkByDefault'])) $GLOBALS['privateLinkByDefault']=false;
+if (empty($GLOBALS['archiveLinkByDefault'])) $GLOBALS['archiveLinkByDefault']=false;
 // I really need to rewrite Shaarli with a proper configuation manager.
 
 // Run config screen if first run:
@@ -114,7 +116,7 @@ require $GLOBALS['config']['CONFIG_FILE'];  // Read login/password hash into $GL
 
 // a token depending of deployment salt, user password, and the current ip
 define('STAY_SIGNED_IN_TOKEN', sha1($GLOBALS['hash'].$_SERVER["REMOTE_ADDR"].$GLOBALS['salt']));
-
+require_once dirname(__FILE__).'/inc/readIt/readityourself.php';
 autoLocale(); // Sniff browser language and set date format accordingly.
 header('Content-Type: text/html; charset=utf-8'); // We use UTF-8 for proper international characters handling.
 
@@ -337,8 +339,8 @@ function isLoggedIn()
         logout();
         return false;
     }
-    if (!empty($_SESSION['longlastingsession']))  $_SESSION['expires_on']=time()+$_SESSION['longlastingsession']; // In case of "Stay signed in" checked.
-    else $_SESSION['expires_on']=time()+INACTIVITY_TIMEOUT; // Standard session expiration date.
+    if (!empty($_SESSION['longlastingsession'])) { $_SESSION['expires_on']=time()+$_SESSION['longlastingsession'];}// In case of "Stay signed in" checked.
+    else {$_SESSION['expires_on']=time()+INACTIVITY_TIMEOUT;}// Standard session expiration date.
 
     return true;
 }
@@ -1399,6 +1401,7 @@ function renderPage()
             $GLOBALS['disablesessionprotection']=!empty($_POST['disablesessionprotection']);
             $GLOBALS['disablejquery']=!empty($_POST['disablejquery']);
             $GLOBALS['privateLinkByDefault']=!empty($_POST['privateLinkByDefault']);
+            $GLOBALS['archiveLinkByDefault']=!empty($_POST['archiveLinkByDefault']);
             writeConfig();
             echo '<script language="JavaScript">alert("Configuration was saved.");document.location=\'?do=tools\';</script>';
             exit;
@@ -1485,8 +1488,17 @@ function renderPage()
         if (!startsWith($url,'http:') && !startsWith($url,'https:') && !startsWith($url,'ftp:') && !startsWith($url,'magnet:') && !startsWith($url,'?'))
             $url = 'http://'.$url;
         $link = array('title'=>trim($_POST['lf_title']),'url'=>$url,'description'=>trim($_POST['lf_description']),'private'=>(isset($_POST['lf_private']) ? 1 : 0),
-                      'linkdate'=>$linkdate,'tags'=>str_replace(',',' ',$tags));
+                      'linkdate'=>$linkdate,'tags'=>str_replace(',',' ',$tags),'savePage'=>'');
         if ($link['title']=='') $link['title']=$link['url']; // If title is empty, use the URL as title.
+        if (isset($_POST['lf_savePage']))
+        {
+            $link['savePage']=savePage($url);
+        }
+        else
+        {
+            delPage($url);
+        }
+
         $LINKSDB[$linkdate] = $link;
         $LINKSDB->savedb(); // save to disk
         pubsubhub();
@@ -1518,6 +1530,8 @@ function renderPage()
         // - confirmation is handled by javascript
         // - we are protected from XSRF by the token.
         $linkdate=$_POST['lf_linkdate'];
+        $test=$LINKSDB[$linkdate]['savePage'];
+        delPage($LINKSDB[$linkdate]['savePage']);
         unset($LINKSDB[$linkdate]);
         $LINKSDB->savedb(); // save to disk
 
@@ -1563,7 +1577,8 @@ function renderPage()
             $title = (empty($_GET['title']) ? '' : $_GET['title'] ); // Get title if it was provided in URL (by the bookmarklet).
             $description = (empty($_GET['description']) ? '' : $_GET['description']); // Get description if it was provided in URL (by the bookmarklet). [Bronco added that]
             $tags = (empty($_GET['tags']) ? '' : $_GET['tags'] ); // Get tags if it was provided in URL
-            $private = (!empty($_GET['private']) && $_GET['private'] === "1" ? 1 : 0); // Get private if it was provided in URL 
+            $private = (!empty($_GET['private']) && $_GET['private'] === "1" ? 1 : 0); // Get private if it was provided in URL
+            $savePage =  (empty($_GET['savePage']) ? '' : $_GET['savePage'] );
             if (($url!='') && parse_url($url,PHP_URL_SCHEME)=='') $url = 'http://'.$url;
             // If this is an HTTP link, we try go get the page to extact the title (otherwise we will to straight to the edit form.)
             if (empty($title) && parse_url($url,PHP_URL_SCHEME)=='http')
@@ -1595,7 +1610,7 @@ function renderPage()
  					}
             }
             if ($url=='') $url='?'.smallHash($linkdate); // In case of empty URL, this is just a text (with a link that point to itself)
-            $link = array('linkdate'=>$linkdate,'title'=>$title,'url'=>$url,'description'=>$description,'tags'=>$tags,'private'=>$private);
+            $link = array('linkdate'=>$linkdate,'title'=>$title,'url'=>$url,'description'=>$description,'tags'=>$tags,'private'=>$private,'savePage'=>$savePage);
         }
 
         $PAGE = new pageBuilder;
@@ -1789,8 +1804,8 @@ function buildLinkList($PAGE,$LINKSDB)
         $search_crits=explode(' ',trim($_GET['searchtags']));
         $search_type='tags';
     }
-    elseif (isset($_SERVER['QUERY_STRING']) && preg_match('/[a-zA-Z0-9-_@]{6}(&.+?)?/',$_SERVER['QUERY_STRING'])) // Detect smallHashes in URL
-    {
+    elseif (isset($_SERVER['QUERY_STRING']) && preg_match('/[a-zA-Z0-9-_@]{6}(&.+?)?^(?genurl=)/',$_SERVER['QUERY_STRING']) && !substr(trim($_SERVER["QUERY_STRING"], '/'),0,6)=='genurl') // Detect smallHashes in URL
+    {    
         $linksToDisplay = $LINKSDB->filterSmallHash(substr(trim($_SERVER["QUERY_STRING"], '/'),0,6));
         if (count($linksToDisplay)==0)
         {
@@ -2261,6 +2276,7 @@ function writeConfig()
     $config .= '$GLOBALS[\'disablesessionprotection\']='.var_export($GLOBALS['disablesessionprotection'],true).'; ';
     $config .= '$GLOBALS[\'disablejquery\']='.var_export($GLOBALS['disablejquery'],true).'; ';
     $config .= '$GLOBALS[\'privateLinkByDefault\']='.var_export($GLOBALS['privateLinkByDefault'],true).'; ';
+     $config .= '$GLOBALS[\'archiveLinkByDefault\']='.var_export($GLOBALS['privateLinkByDefault'],true).'; ';
     $config .= ' ?>';
     if (!file_put_contents($GLOBALS['config']['CONFIG_FILE'],$config) || strcmp(file_get_contents($GLOBALS['config']['CONFIG_FILE']),$config)!=0)
     {

@@ -51,6 +51,9 @@
                 <div style="position:relative;display:inline;"><a href="http://qrfree.kaywa.com/?l=1&s=8&d={$scripturl|urlencode}%3F{$value.linkdate|smallHash}" 
                     onclick="showQrCode(this); return false;" class="qrcode" data-permalink="{$scripturl}?{$value.linkdate|smallHash}"><img src="images/qrcode.png#" width="13" height="13" title="QR-Code"></a></div> - 
                 <span class="linkurl" title="Short link">{$value.url|htmlspecialchars}</span><br>
+                {if="$value.savePage"}
+                <span class="linkurl"><a id="{$value.savePage}" onclick="getPage(this);" href="#">Archive</a></span><br>
+                {/if}
                 {if="$value.tags"}
                     <div class="linktaglist">
                     {loop="value.taglist"}<span class="linktag" title="Add tag"><a href="?addtag={$value|urlencode}">{$value|htmlspecialchars}</a></span> {/loop}
