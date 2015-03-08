@@ -1,6 +1,7 @@
 #readityourselfcontent
 {
-  margin:3% 20%;
+  margin-left:20%;
+  margin-top:5%;
   width:60%;
   color:white;
   background-color:black;
@@ -25,11 +26,11 @@
 {
   float:right;
   position:relative;
-  top:-20px;
-  left:10px;
   background-color: green;
   color:black;
-  font-size: 1.2em;
+  top:-1%;
+  left:1%;
+  font-size: 1em;
   padding: 0.2em;
   border-radius: 100%;
 }
@@ -37,4 +38,44 @@
 #readityourselfcontent #btnclose:hover
 {
   background-color: yellow;
+}
+@media (max-width: 800px) 
+{
+  #readityourselfcontent
+{
+  margin-top:10%;
+  margin-left:5%;
+  width:85%;
+}
+ 
+   #readityourselfcontent #btnclose
+{
+  top:-0.1%;
+  left:1%;
+  font-size: 1em;
+}
+}
+
+
+
+@media (max-width: 400px) 
+{
+  #readityourselfcontent
+{
+  margin-top:20%;
+  margin-left:5%;
+  width:85%;
+}
+  
+  
+    #readityourselfcontent img
+    {
+      width: 100%; height: auto;
+    }
+   #readityourselfcontent #btnclose
+{
+  top:-0.1%;
+  left:1%;
+  font-size: 1em;
+}
 }
