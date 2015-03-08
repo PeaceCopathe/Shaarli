@@ -1,0 +1,40 @@
+#readityourselfcontent
+{
+  margin:3% 20%;
+  width:60%;
+  color:white;
+  background-color:black;
+  padding:2% 2% 2% 2%;
+  border-radius: 10px;
+  box-shadow: -10px 0px 20px green,10px 0px 20px green;
+  font-size:1.5em;
+  position:absolute;
+  top:0;
+}
+#readityourselfcontent a
+{
+  text-decoration: none;
+  color: green;
+}
+#readityourselfcontent a:hover
+{
+  color:yellow;
+}
+
+#readityourselfcontent #btnclose
+{
+  float:right;
+  position:relative;
+  top:-20px;
+  left:10px;
+  background-color: green;
+  color:black;
+  font-size: 1.2em;
+  padding: 0.2em;
+  border-radius: 100%;
+}
+
+#readityourselfcontent #btnclose:hover
+{
+  background-color: yellow;
+}
