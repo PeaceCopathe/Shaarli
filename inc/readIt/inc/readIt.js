@@ -1,16 +1,19 @@
-function getQuerystring(key, default_) {
-       if (default_==null) default_="";
-       key = key.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-       var regex = new RegExp("[\\?&]"+key+"=([^&#]*)");
-       var qs = regex.exec(window.location.href);
-       if(qs == null) return default_; else return qs[1];
-   }
+// vérifie la présence d'un paramètre dans l'url de la page et renvoie ça valeur
+function getQuerystring(key, default_) 
+{
+    if (default_==null) default_="";
+    key = key.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    var regex = new RegExp("[\\?&]"+key+"=([^&#]*)");
+    var qs = regex.exec(window.location.href);
+    if(qs == null) return default_; else return qs[1];
 
+}
 
 
 
 function getPage(e)
 {
+    killWindowModal();
     adresse='';
     mesparametres='genurl='+e.id+'&json=true';
     maRequete = new Ajax_request(adresse, 
@@ -21,6 +24,20 @@ function getPage(e)
                     params : mesparametres, /*  mes paramètres si il y en as */
                 });
 }
+
+function killWindowModal()
+{
+    try 
+    {
+      document.getElementById('readityourselfcontent').parentNode.removeChild(document.getElementById('readityourselfcontent'));
+    } 
+    catch(e) 
+    {
+     return;
+    }
+    window.location.href='test';
+}
+
 // génère la fenetre modal si réception
 function getPageSucess(xhr)
 {
@@ -31,7 +48,7 @@ function getPageSucess(xhr)
     btnclose.id='btnclose';
     btnclose.href='#';
     btnclose.innerHTML='X';
-    btnclose.onclick=function(){document.getElementById('readityourselfcontent').parentNode.removeChild(document.getElementById('readityourselfcontent'));};
+    btnclose.onclick=killWindowModal;//function(){document.getElementById('readityourselfcontent').parentNode.removeChild(document.getElementById('readityourselfcontent'));};
     archive.appendChild(btnclose);
     
     urlOrigin=document.createElement('a');
