@@ -1,43 +1,13 @@
 <?php
- ini_set('display_errors', '1');
  libxml_use_internal_errors(true);
-// FUNCTIONS BEGIN
+
+// Ajout des includes
 require_once dirname(__FILE__).'/inc/config.php';
 require_once dirname(__FILE__).'/inc/Readability.php';
 require_once dirname(__FILE__).'/inc/Encoding.php';
 require_once dirname(__FILE__).'/class/Article.php';
 require_once dirname(__FILE__).'/class/Utils.php';
 require_once dirname(__FILE__).'/class/Readityourself.php';
-
-
-// FUNCTIONS BEGIN
-
-
-// function generate_page($url,$title,$content) 
-// {
-//     global $CSS_STYLE;
-
-// 	raintpl::$tpl_dir = './tpl/'; // template directory
-// 	raintpl::$cache_dir = "./cache/"; // cache directory
-// 	raintpl::$base_url = url(); // base URL of blog
-// 	raintpl::configure( 'path_replace', false );
-// 	raintpl::configure('debug', true); 
-
-// 	$tpl = new raintpl(); //include Rain TPL
-
-// 	$tpl->assign( "url", $url);
-// 	$tpl->assign( "tinyurl", md5($url));
-// 	$tpl->assign( "title", $title);
-
-    
-
-//     $tpl->assign( "content", $content);
-// 	$tpl->assign( "version", VERSION);
-	
-// 	$tpl->draw( "articles"); // draw the template
-// }
-
-
 
 
 // fonction qui sauvegarde la page
@@ -91,7 +61,7 @@ function getPage($url)
     }  
 }
 
-// vérifie l'url et vire le https
+// Vérifie l'url et vire le https
 
 function verifUrl($url)
 {
@@ -126,6 +96,7 @@ function verifUrl($url)
     return false;
 }
 
+// supprimer l'archive
 function delPage($url)
 {   
     $article = new Article;
@@ -146,45 +117,46 @@ function delPage($url)
     }
 }
 
-//
+//On vérifie qu'on appel bien le script avec la page principal de shaarli
 if (!function_exists ( 'isLoggedIn' ))
 {
     echo 'Error, but why ???!!';
     exit();
 }
 
-
+// on verifie si on est logguer ou si shaarli libre
 if (isLoggedIn())
 {
-// fonction pour sauvegader la page
-if(isset($_GET['saveurl']) && $_GET['saveurl'] != null && trim($_GET['saveurl']) != "") 
-{
-    if ($url=verifUrl($_GET['saveurl']))
-    {       
-        if(!savePage($url))
-        {
-            echo "Error unable to get link : ".$url;
-            exit();
-        }
-    }    
+    // fonction pour sauvegader la page
+    if(isset($_GET['saveurl']) && $_GET['saveurl'] != null && trim($_GET['saveurl']) != "") 
+    {
+        if ($url=verifUrl($_GET['saveurl']))
+        {       
+            if(!savePage($url))
+            {
+                echo "Error unable to get link : ".$url;
+                exit();
+            }
+        }    
+    }
+    // fonction pour supprimer la page
+    if(isset($_GET['delurl']) && $_GET['delurl'] != null && trim($_GET['delurl']) != "") 
+    {
+        if ($url=verifUrl($_GET['delurl']))
+        {       
+            if(!delPage($url))
+            {
+                echo "Error unable to del link : ".$url;
+                exit();
+            }
+            else
+            {
+                return True;
+            }
+        }    
+    }
 }
-// fonction pour supprimer la page
-if(isset($_GET['delurl']) && $_GET['delurl'] != null && trim($_GET['delurl']) != "") 
-{
-    if ($url=verifUrl($_GET['delurl']))
-    {       
-        if(!delPage($url))
-        {
-            echo "Error unable to del link : ".$url;
-            exit();
-        }
-        else
-        {
-            return True;
-        }
-    }    
-}
-}
+
 //fonction pour récup la page, en json, ou normal
 if(isset($_GET['genurl']) && $_GET['genurl'] != null && trim($_GET['genurl']) != "") 
 {
@@ -208,15 +180,3 @@ if(isset($_GET['genurl']) && $_GET['genurl'] != null && trim($_GET['genurl']) !=
     }    
 }
 
-
-        
-
-
-
-
-
-
-
-
-
-?>

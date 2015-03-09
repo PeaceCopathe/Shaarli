@@ -3,7 +3,7 @@
 class Utils {
 
     /**
-     * Create a folder for ressouesrc
+     * Create a folder for ressource
      */
     public static function create_assets_directory($url,$create=false) 
     {
@@ -68,6 +68,7 @@ class Utils {
 
         return $doc->saveHTML();
     }
+
 
     public static function absolute_for_DOM_and_query($doc, $query, $base) {
         $xpath = new DOMXPath($doc);
@@ -199,6 +200,7 @@ class Utils {
         return $scheme . '://' . $abs;
     }
 
+    // supprimer un répertoire et son contenu en php
     public static function delDir($dir)  
       { 
        $current_dir = opendir($dir); 

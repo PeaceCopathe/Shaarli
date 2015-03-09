@@ -21,7 +21,7 @@ function getPage(e)
                     params : mesparametres, /*  mes paramètres si il y en as */
                 });
 }
-
+// génère la fenetre modal si réception
 function getPageSucess(xhr)
 {
     var maPage = JSON.parse(xhr.responseText);
@@ -54,11 +54,13 @@ function getPageSucess(xhr)
     archive.appendChild(archiveContent);
     document.body.appendChild(archive);
 }
+
+// affiche la réponse du serveur si erreur
 function getPageError(xhr)
 {
-    alert('error'+xhr);
+    alert('error'+xhr.responseText);
 }
-
+// si on accede à la page par un lien direct on ouvre la modal direct
 if(page=getQuerystring('genurl'))
 {
     pageId=document.createElement('div');
