@@ -23,6 +23,7 @@ function getPage(e)
                     onError : getPageError, /* fonction appeler si erreur sans les parenthese*/
                     params : mesparametres, /*  mes paramètres si il y en as */
                 });
+    return false;
 }
 
 function killWindowModal()
@@ -35,7 +36,6 @@ function killWindowModal()
     {
      return;
     }
-    window.location.href='test';
 }
 
 // génère la fenetre modal si réception

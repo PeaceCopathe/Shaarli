@@ -1,6 +1,5 @@
 <?php
  libxml_use_internal_errors(true);
-
 // Ajout des includes
 require_once dirname(__FILE__).'/inc/config.php';
 require_once dirname(__FILE__).'/inc/Readability.php';

@@ -52,7 +52,7 @@
                     onclick="showQrCode(this); return false;" class="qrcode" data-permalink="{$scripturl}?{$value.linkdate|smallHash}"><img src="images/qrcode.png#" width="13" height="13" title="QR-Code"></a></div> - 
                 <span class="linkurl" title="Short link">{$value.url|htmlspecialchars}</span><br>
                 {if="$value.savePage"}
-                <span class="linkurl"><a id="{$value.savePage}" onclick="getPage(this);" href="#">Archive</a></span><br>
+                <span class="linkurl"><a id="{$value.savePage}" onclick="getPage(this);return false;" href="?genurl={$value.savePage}">Archive</a></span><br>
                 {/if}
                 {if="$value.tags"}
                     <div class="linktaglist">
